@@ -1,0 +1,6 @@
+npm i -g @nestjs/cli
+nest new 9803Server2JSNest = 9803-server2-jsnest
+nest g --help
+nest g co products
+
+
