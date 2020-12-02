@@ -1,60 +1,54 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Header,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-  Put,
-  Redirect,
-  Req,
-  Res,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Header,
+    HttpCode,
+    HttpStatus,
+    Param,
+    Post,
+    Put,
+    Redirect,
+    Req,
+    Res,
 } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { Request, Response } from 'express';
+import {CreateProductDto} from './dto/create-product.dto';
+import {UpdateProductDto} from './dto/update-product.dto';
+import {ProductsService} from './products.service';
+import {Product} from './schemas/product.schema';
+
 
 @Controller('products')
 export class ProductsController {
-  @Get('r')
-  @Redirect('https://docs.nestjs.com', 301)
-  getRedirect() {
-    return 'getRedirect';
-  }
 
-  @Get()
-  getAll(@Req() req: Request, @Res() res: Response) {
-    req.rawHeaders.forEach((h) => {
-      console.log('getAll= ', h);
-    });
-    res.status(202).end('ok'); //заменит return
-    return 'getAll';
-  }
+    constructor(private readonly productsService: ProductsService) {
+    }
 
-  @Get(':id')
-  getOne(@Param('id') id: string): string {
-    return 'getOne ' + id;
-  }
+    @Get()
+    getAll(): Promise<Product[]> {
+        return this.productsService.getAll()
+    }
 
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  @Header('Cache1', 'none')
-  create(@Body() createProductDto: CreateProductDto): string {
-    return (
-      'title ' + createProductDto.title + ' price ' + createProductDto.price
-    );
-  }
+    @Get(':id')
+    getOne(@Param('id') id: string): Promise<Product> {
+        return this.productsService.getById(id)
+    }
 
-  @Delete(':id')
-  delete(@Param('id') id: string) {
-    return 'delete ' + id;
-  }
+    @Post()
+    @HttpCode(HttpStatus.CREATED)
+    @Header('Cache1', 'none')
+    create(@Body() createProductDto: CreateProductDto): Promise<Product> {
+        return this.productsService.create(createProductDto)
+    }
 
-  @Put(':id')
-  put(@Body() updateProductDto: UpdateProductDto, @Param('id') id: string) {
-    return 'put ' + updateProductDto.price + ' -- ' + id;
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string): Promise<Product> {
+        return this.productsService.remove(id)
+    }
+
+    @Put(':id')
+    update(@Body() updateProductDto: UpdateProductDto, @Param('id') id: string): Promise<Product> {
+        return this.productsService.update(id, updateProductDto)
+    }
 }
